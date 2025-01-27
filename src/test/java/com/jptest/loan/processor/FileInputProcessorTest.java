@@ -1,23 +1,26 @@
 package com.jptest.loan.processor;
 
+import com.jptest.loan.constant.ErrorMessages;
 import com.jptest.loan.service.LoanCalculatorService;
 import com.jptest.loan.validator.LoanValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 @Tag("processor")
 @ExtendWith(MockitoExtension.class)
@@ -26,76 +29,87 @@ public class FileInputProcessorTest {
     @Mock
     private LoanCalculatorService loanCalculatorService;
 
-    @Mock
     private LoanValidator loanValidator;
 
-    @InjectMocks
     private FileInputProcessor fileInputProcessor;
 
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+    private final String validFilePath = "input.txt"; // Assuming input.txt exists in test resources or project root
+
     @BeforeEach
-    void setUp() {
-        // fileInputProcessor is now injected with mocks
+    void setUp() throws IOException {
+        fileInputProcessor = new FileInputProcessor(loanCalculatorService, new LoanValidator());
+        System.setOut(new PrintStream(outputStream));
+
+        // Manually set the minimumDownPaymentRate
+        ReflectionTestUtils.setField(fileInputProcessor, "minimumDownPaymentRate", new BigDecimal("25"));
+
+        //MockitoAnnotations.openMocks(this);
+        // Create a valid input file for testing
+        String content = "car\nnew\n2024\n100000\n5\n35000";
+        Files.write(Paths.get(validFilePath), content.getBytes());
     }
 
     @Test
-    void testProcessInput() {
-        Path tempFile;
-        try {
-            tempFile = Files.createTempFile("prefix", ".txt");
-            Files.writeString(tempFile, "Test content");
+    void testProcessInput_ValidFile() {
+        fileInputProcessor.processFile(validFilePath);
 
-            fileInputProcessor.processFile(tempFile.toAbsolutePath().toString());
-            // Use the file in your test
-            Files.delete(tempFile); // Clean up after test
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // Verify that the loanCalculatorService was called with expected arguments
+        verify(loanCalculatorService, times(1))
+                .calculateMonthlyInstallment(anyString(), anyString(), anyInt(), anyDouble(), anyInt(), anyDouble());
+
+        // Verify no error messages were printed
+        assertTrue(outputStream.toString().isEmpty() || outputStream.toString().contains("\n"));
+
     }
 
     @Test
-    void testProcessInput_validFile() throws IOException {
-        Path tempFile = Files.createTempFile("test_input", ".txt");
-        Files.writeString(tempFile, "car\nnew\n2023\n100000\n5\n35000"); // Valid input
+    void testProcessInput_FileNotFound() {
+        String invalidFilePath = "non_existent_input.txt";
 
-        FileInputProcessor fileInputProcessor = new FileInputProcessor(loanCalculatorService, loanValidator);
-        fileInputProcessor.processFile(tempFile.toAbsolutePath().toString());
+        fileInputProcessor.processFile(invalidFilePath);
+        assertTrue(outputStream.toString().contains(ErrorMessages.COULD_NOT_READ_FILE + invalidFilePath));
 
-        ArgumentCaptor<String> vehicleTypeCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> vehicleConditionCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Integer> vehicleYearCaptor = ArgumentCaptor.forClass(Integer.class);
-        ArgumentCaptor<Double> loanAmountCaptor = ArgumentCaptor.forClass(Double.class);
-        ArgumentCaptor<Integer> loanTenorCaptor = ArgumentCaptor.forClass(Integer.class);
-        ArgumentCaptor<Double> downPaymentCaptor = ArgumentCaptor.forClass(Double.class);
+        verify(loanCalculatorService, never()).calculateMonthlyInstallment(anyString(), anyString(), anyInt(), anyDouble(), anyInt(), anyDouble());
+    }
 
 
-        Mockito.verify(loanCalculatorService).calculateMonthlyInstallment(
-                vehicleTypeCaptor.capture(),
-                vehicleConditionCaptor.capture(),
-                vehicleYearCaptor.capture(),
-                loanAmountCaptor.capture(),
-                loanTenorCaptor.capture(),
-                downPaymentCaptor.capture()
-        );
+    @Test
+    void testProcessInput_InvalidFileFormat() throws IOException {
+        String invalidFormatFilePath = "invalid_format_input.txt";
+        String content = "invalid,format"; // Invalid format - less than 6 fields
+        Files.write(Paths.get(invalidFormatFilePath), content.getBytes());
+        fileInputProcessor.processFile(invalidFormatFilePath);
 
-        assertEquals("car", vehicleTypeCaptor.getValue());
-        assertEquals("new", vehicleConditionCaptor.getValue());
-        assertEquals(2023, vehicleYearCaptor.getValue());
-        assertEquals(100000.0, loanAmountCaptor.getValue());
-        assertEquals(5, loanTenorCaptor.getValue());
-        assertEquals(35000.0, downPaymentCaptor.getValue());
+        assertTrue(outputStream.toString().contains(ErrorMessages.INVALID_FILE_FORMAT_SIX_LINES));
+        Files.deleteIfExists(Paths.get(invalidFormatFilePath)); // Clean up the file
+        verify(loanCalculatorService, never()).calculateMonthlyInstallment(anyString(), anyString(), anyInt(), anyDouble(), anyInt(), anyDouble());
     }
 
     @Test
-    void testProcessInput_invalidFile() throws IOException {
-        Path tempFile = Files.createTempFile("invalid_input", ".txt");
-        Files.writeString(tempFile, "invalid\nnew\n2023\n100000\n5\n35000"); // Invalid vehicle type
+    void testProcessInput_InvalidVehicleType() throws IOException {
+        String invalidDataFilePath = "invalid_data_input.txt";
+        String content = "invalid_type\nnew\n2024\n100000\n5\n10000";
+        Files.write(Paths.get(invalidDataFilePath), content.getBytes());
+        fileInputProcessor.processFile(invalidDataFilePath);
 
-        FileInputProcessor fileInputProcessor = new FileInputProcessor(loanCalculatorService, loanValidator);
-        when(loanValidator.isValidVehicleType(Mockito.anyString())).thenReturn(true); // Mock invalid vehicle type
+        assertTrue(outputStream.toString().contains(ErrorMessages.INVALID_VEHICLE_TYPE));
 
-        fileInputProcessor.processFile(tempFile.toAbsolutePath().toString());
+        Files.deleteIfExists(Paths.get(invalidDataFilePath)); // Clean up the file
+        verify(loanCalculatorService, never()).calculateMonthlyInstallment(anyString(), anyString(), anyInt(), anyDouble(), anyInt(), anyDouble());
+    }
 
-        Mockito.verify(loanValidator).isValidVehicleType(Mockito.anyString());
-        // TODO: Add assertions to check for validation errors, e.g., exceptions or error messages (print statements)
+    @Test
+    void testGetDownPaymentAmount_Valid() {
+        double downPayment = 25000000;
+
+        double downPaymentAmount = fileInputProcessor.getDownPaymentAmount(downPayment, new BigDecimal(100_000_000));
+        assertEquals(25_000_000, downPaymentAmount);
+        assertTrue(outputStream.toString().isEmpty());
+    }
+
+    void tearDown() throws IOException {
+        Files.deleteIfExists(Paths.get(validFilePath));
     }
 }

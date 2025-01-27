@@ -1,5 +1,6 @@
 package com.jptest.loan.service;
 
+import com.jptest.loan.constant.AppConstant;
 import com.jptest.loan.dto.MonthlyInstallmentRatePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -70,17 +71,6 @@ public class LoanCalculatorServiceImpl implements LoanCalculatorService {
         BigDecimal minimumDownPaymentRate;
         BigDecimal loanTenorYearly;
         BigDecimal loanTenorMonthly;
-        minimumDownPaymentRate = minimumDownPayment.divide(new BigDecimal(100));
-
-        // Rules
-        int currentYear = Year.now().getValue();
-        if ("new".equalsIgnoreCase(vehicleCondition) && vehicleYear < currentYear - 1) {
-            throw new IllegalArgumentException("Year for 'NEW' vehicle cannot be less than current year - 1");
-        }
-
-        if(downPaymentCalc.compareTo(loanAmountCalc.multiply(minimumDownPaymentRate)) < 0){
-            throw new IllegalArgumentException("Down payment must be at least 25% of the loan amount");
-        }
 
         // Interest Rate Calculation
         BigDecimal baseInterestRate;

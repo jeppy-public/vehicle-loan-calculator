@@ -3,7 +3,6 @@ package com.jptest.loan.validator;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,25 +15,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("validation")
 @ExtendWith(MockitoExtension.class)
 class LoanValidatorTest {
-    @Mock
-    private LoanValidator loanValidator;
+    private LoanValidator loanValidator = new LoanValidator();
 
     /**
      * Test case for {@link LoanValidator#isValidYearFourDigit(int)} for valid four-digit year.
-     * Verifies that a valid four-digit year returns false, indicating it is not invalid.
+     * Verifies that a valid four-digit year returns true, indicating it is not valid.
      */
     @Test
     void isValidYearFourDigit_Valid() {
-        assertFalse(loanValidator.isValidYearFourDigit(2024));
+        assertTrue(loanValidator.isValidYearFourDigit(2024));
     }
 
     /**
      * Test case for {@link LoanValidator#isValidYearFourDigit(int)} for invalid two-digit year.
-     * Verifies that an invalid two-digit year returns true, indicating it is invalid.
+     * Verifies that an invalid two-digit year returns false, indicating it is invalid.
      */
     @Test
     void isValidYearFourDigit_Invalid() {
-        assertTrue(loanValidator.isValidYearFourDigit(24));
+        assertFalse(loanValidator.isValidYearFourDigit(24));
     }
 
     /**
@@ -43,7 +41,7 @@ class LoanValidatorTest {
      */
     @Test
     void isValidYearCompareWithCurrentYear_Valid() {
-        assertFalse(loanValidator.isValidYearCompareWithCurrentYear(2023));
+        assertTrue(loanValidator.isValidYearCompareWithCurrentYear(2023));
     }
 
     /**
@@ -61,7 +59,7 @@ class LoanValidatorTest {
      */
     @Test
     void isValidLoanAmount_Valid() {
-        assertFalse(loanValidator.isValidLoanAmount(1000));
+        assertTrue(loanValidator.isValidLoanAmount(1000));
     }
 
     /**
@@ -97,7 +95,7 @@ class LoanValidatorTest {
      */
     @Test
     void isValidVehicleType_Valid_Car() {
-        assertFalse(loanValidator.isValidVehicleType("car"));
+        assertTrue(loanValidator.isValidVehicleType("car"));
     }
 
     /**
@@ -106,7 +104,7 @@ class LoanValidatorTest {
      */
     @Test
     void isValidVehicleType_Valid_Motorcycle() {
-        assertFalse(loanValidator.isValidVehicleType("motorcycle"));
+        assertTrue(loanValidator.isValidVehicleType("motorcycle"));
     }
 
     /**
@@ -124,7 +122,7 @@ class LoanValidatorTest {
      */
     @Test
     void isValidVehicleCondition_Valid_New() {
-        assertFalse(loanValidator.isValidVehicleCondition("new"));
+        assertTrue(loanValidator.isValidVehicleCondition("new"));
     }
 
     /**
@@ -133,16 +131,16 @@ class LoanValidatorTest {
      */
     @Test
     void isValidVehicleCondition_Valid_Old() {
-        assertFalse(loanValidator.isValidVehicleCondition("old"));
+        assertTrue(loanValidator.isValidVehicleCondition("old"));
     }
 
     /**
      * Test case for {@link LoanValidator#isValidVehicleCondition(String)} for invalid vehicle condition "used".
-     * Verifies that an invalid vehicle condition "used" returns true, indicating it is invalid.
+     * Verifies that an invalid vehicle condition "used" returns false, indicating it is invalid.
      */
     @Test
     void isValidVehicleCondition_Invalid() {
-        assertTrue(loanValidator.isValidVehicleCondition("used"));
+        assertFalse(loanValidator.isValidVehicleCondition("used"));
     }
 
     /**

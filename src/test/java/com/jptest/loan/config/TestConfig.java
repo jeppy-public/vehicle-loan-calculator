@@ -12,4 +12,9 @@ public class TestConfig {
     public LoanCalculatorService loanCalculatorService() {
         return new LoanCalculatorServiceImpl();
     }
+
+    @Bean
+    public LoanValidator loanValidator() {
+        return new LoanValidator();
+    }
 }
