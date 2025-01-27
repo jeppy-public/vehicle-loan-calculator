@@ -1,6 +1,5 @@
 package com.jptest.loan.service;
 
-import com.jptest.loan.constant.AppConstant;
 import com.jptest.loan.dto.MonthlyInstallmentRatePair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 

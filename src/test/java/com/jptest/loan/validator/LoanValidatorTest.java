@@ -10,16 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link LoanValidator}.
- * This class contains test methods to verify the validation logic for loan inputs.
+ * This test class is designed to verify the validation logic implemented
+ * in the {@code LoanValidator} class. It includes tests for various input
+ * validations such as year format, year comparison with current year,
+ * loan amount, vehicle type, vehicle condition, and loan tenor.
+ *
+ * Each test method focuses on a specific validation rule, ensuring that
+ * the {@code LoanValidator} correctly identifies valid and invalid inputs
+ * for loan applications.
  */
 @Tag("validation")
 @ExtendWith(MockitoExtension.class)
 class LoanValidatorTest {
-    private LoanValidator loanValidator = new LoanValidator();
+    private final LoanValidator loanValidator = new LoanValidator();
 
     /**
-     * Test case for {@link LoanValidator#isValidYearFourDigit(int)} for valid four-digit year.
-     * Verifies that a valid four-digit year returns true, indicating it is not valid.
+     * Tests {@link LoanValidator#isValidYearFourDigit(int)} for valid input.
+     * This test verifies that the validator correctly identifies a four-digit number
+     * as a valid year format.
      */
     @Test
     void isValidYearFourDigit_Valid() {
@@ -27,8 +35,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidYearFourDigit(int)} for invalid two-digit year.
-     * Verifies that an invalid two-digit year returns false, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidYearFourDigit(int)} for invalid input.
+     * This test ensures that the validator rejects a two-digit number as an invalid
+     * year format, expecting a four-digit year.
      */
     @Test
     void isValidYearFourDigit_Invalid() {
@@ -36,8 +45,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidYearCompareWithCurrentYear(int)} for valid past year.
-     * Verifies that a valid past year returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidYearCompareWithCurrentYear(int)} for valid input.
+     * This test checks if the validator accepts a past year as valid, as vehicle year
+     * should not be in the future relative to the current year.
      */
     @Test
     void isValidYearCompareWithCurrentYear_Valid() {
@@ -45,8 +55,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidYearCompareWithCurrentYear(int)} for invalid future year.
-     * Verifies that an invalid future year returns true, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidYearCompareWithCurrentYear(int)} for invalid input.
+     * This test verifies that the validator rejects a future year, ensuring that
+     * vehicle year is not set in the future.
      */
     @Test
     void isValidYearCompareWithCurrentYear_Invalid() {
@@ -54,8 +65,8 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanAmount(double)} for valid loan amount.
-     * Verifies that a valid loan amount returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidLoanAmount(double)} with a valid loan amount.
+     * This test ensures that the validator accepts a loan amount within the valid range.
      */
     @Test
     void isValidLoanAmount_Valid() {
@@ -63,8 +74,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanAmount(double)} for invalid zero loan amount.
-     * Verifies that an invalid zero loan amount returns true, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidLoanAmount(double)} with an invalid zero loan amount.
+     * This test verifies that the validator rejects zero as a loan amount,
+     * as loan amounts must be positive.
      */
     @Test
     void isValidLoanAmount_Invalid_Zero() {
@@ -72,8 +84,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanAmount(double)} for invalid negative loan amount.
-     * Verifies that an invalid negative loan amount returns true, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidLoanAmount(double)} with a negative loan amount.
+     * This test ensures that the validator rejects negative values as invalid
+     * loan amounts, which are not logically possible.
      */
     @Test
     void isValidLoanAmount_Invalid_Negative() {
@@ -81,8 +94,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanAmount(double)} for invalid too large loan amount.
-     * Verifies that an invalid too large loan amount returns true, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidLoanAmount(double)} with an excessively large loan amount.
+     * This test checks if the validator correctly identifies and rejects loan amounts
+     * that exceed the maximum allowed limit.
      */
     @Test
     void isValidLoanAmount_Invalid_TooLarge() {
@@ -90,8 +104,8 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleType(String)} for valid vehicle type "car".
-     * Verifies that a valid vehicle type "car" returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidVehicleType(String)} with a valid vehicle type "car".
+     * This test verifies that the validator recognizes "car" as a valid vehicle type.
      */
     @Test
     void isValidVehicleType_Valid_Car() {
@@ -99,8 +113,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleType(String)} for valid vehicle type "motorcycle".
-     * Verifies that a valid vehicle type "motorcycle" returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidVehicleType(String)} with a valid vehicle type "motorcycle".
+     * This test ensures that the validator correctly identifies "motorcycle"
+     * as a valid vehicle type option.
      */
     @Test
     void isValidVehicleType_Valid_Motorcycle() {
@@ -108,8 +123,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleType(String)} for invalid vehicle type "truck".
-     * Verifies that an invalid vehicle type "truck" returns true, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidVehicleType(String)} with an invalid vehicle type "truck".
+     * This test checks if the validator rejects "truck", which is not a supported
+     * vehicle type in the loan application.
      */
     @Test
     void isValidVehicleType_Invalid() {
@@ -117,8 +133,8 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleCondition(String)} for valid vehicle condition "new".
-     * Verifies that a valid vehicle condition "new" returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidVehicleCondition(String)} with a valid condition "new".
+     * This test verifies that the validator accepts "new" as a valid vehicle condition.
      */
     @Test
     void isValidVehicleCondition_Valid_New() {
@@ -126,8 +142,8 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleCondition(String)} for valid vehicle condition "old".
-     * Verifies that a valid vehicle condition "old" returns false, indicating it is not invalid.
+     * Tests {@link LoanValidator#isValidVehicleCondition(String)} with a valid condition "old".
+     * This test ensures the validator recognizes "old" as a valid vehicle condition.
      */
     @Test
     void isValidVehicleCondition_Valid_Old() {
@@ -135,8 +151,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidVehicleCondition(String)} for invalid vehicle condition "used".
-     * Verifies that an invalid vehicle condition "used" returns false, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidVehicleCondition(String)} with an invalid condition "used".
+     * This test checks if the validator rejects "used" as it is not a supported
+     * vehicle condition for loan applications.
      */
     @Test
     void isValidVehicleCondition_Invalid() {
@@ -144,8 +161,8 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanTenor(int)} for valid loan tenor.
-     * Verifies that a valid loan tenor returns true, indicating it is valid.
+     * Tests {@link LoanValidator#isValidLoanTenor(int)} with a valid loan tenor.
+     * This test verifies that the validator accepts a loan tenor within the allowed range.
      */
     @Test
     void isValidLoanTenor_Valid() {
@@ -153,8 +170,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanTenor(int)} for invalid too short loan tenor.
-     * Verifies that an invalid too short loan tenor returns false, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidLoanTenor(int)} with an invalid, too short loan tenor.
+     * This test ensures that the validator rejects a loan tenor that is too short,
+     * specifically zero years, as invalid.
      */
     @Test
     void isValidLoanTenor_Invalid_TooShort() {
@@ -162,8 +180,9 @@ class LoanValidatorTest {
     }
 
     /**
-     * Test case for {@link LoanValidator#isValidLoanTenor(int)} for invalid too long loan tenor.
-     * Verifies that an invalid too long loan tenor returns false, indicating it is invalid.
+     * Tests {@link LoanValidator#isValidLoanTenor(int)} with an invalid, too long loan tenor.
+     * This test checks if the validator correctly identifies and rejects loan tenors
+     * that exceed the maximum allowed duration.
      */
     @Test
     void isValidLoanTenor_Invalid_TooLong() {
