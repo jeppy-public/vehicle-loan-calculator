@@ -40,6 +40,15 @@ This is a simple command-line application built with Java and Spring Boot to cal
 
    This will start the Vehicle Loan Calculator application.
 
+5. **Run the application (JAR):**
+   ```bash
+   mvn clean install
+   java -jar ./target/vehicle-loan-calculator-0.0.1-SNAPSHOT.jar
+   ```
+
+   This will start the Vehicle Loan Calculator application.
+
+
 ## How to Install
 
 As a command-line application, installation primarily involves building the application from source. No traditional installation steps are required beyond having the prerequisites installed.
