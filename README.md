@@ -68,6 +68,8 @@ The application supports two modes of operation:
 - Follow the prompts and enter the required information.
 - The application will then calculate and display the monthly installment.
 
+![Image](https://github.com/user-attachments/assets/e088ae03-0ee7-46a5-a70e-e01c200f841b)
+
 ### 2. File Input Mode
 - You can provide input via a text file named `input.txt` placed in the root directory of the project.
 - The `input.txt` file should contain loan details in the following order, each on a new line:
